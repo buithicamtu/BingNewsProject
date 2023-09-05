@@ -1,0 +1,34 @@
+{
+  "categories": [
+    {
+      "Cate_Title": "Sport",
+      "channels": [
+        {
+          "channelName": "VN Express",
+          "rssUrl": "https://vnexpress.net/rss/the-thao.rss"
+        },
+        {
+          "channelName": "Thanh Nien",
+          "rssUrl": "https://thanhnien.vn/rss/the-thao.rss"
+        },
+        {
+          "channelName": "The New York Times",
+          "rssUrl": "https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml"
+        }
+      ]
+    },
+    {
+      "Cate_Title": "Business",
+      "channels": [
+        {
+          "channelName": "The New York Times",
+          "rssUrl": "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"
+        },
+        {
+          "channelName": "The Economist",
+          "rssUrl": "https://www.economist.com/united-states/rss.xml"
+        }
+      ]
+    }
+  ]
+}

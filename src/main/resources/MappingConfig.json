@@ -1,0 +1,95 @@
+{
+  "channels": [
+    {
+      "channelName": "VN Express",
+      "propertyMappings": [
+        {
+          "propertyName": "title",
+          "tagName": "title"
+        },
+        {
+          "propertyName": "description",
+          "tagName": "description"
+        },
+        {
+          "propertyName": "link",
+          "tagName": "link"
+        },
+        {
+          "propertyName": "pubDate",
+          "tagName": "pubDate"
+        },
+        {
+          "propertyName": "guid",
+          "tagName": "guid"
+        }
+      ]
+    },
+    {
+      "channelName": "Thanh Nien",
+      "propertyMappings": [
+        {
+          "propertyName": "title",
+          "tagName": "title"
+        },
+        {
+          "propertyName": "description",
+          "tagName": "description"
+        },
+        {
+          "propertyName": "link",
+          "tagName": "link"
+        },
+        {
+          "propertyName": "pubDate",
+          "tagName": "pubDate"
+        },
+        {
+          "propertyName": "guid",
+          "tagName": "guid"
+        },
+        {
+          "propertyName": "imgUrl",
+          "tagName": "description#src"
+        }
+      ]
+    },
+    {
+      "channelName": "The New York Times",
+      "propertyMappings": [
+        {
+          "propertyName": "title",
+          "tagName": "title"
+        },
+        {
+          "propertyName": "description",
+          "tagName": "description"
+        },
+        {
+          "propertyName": "sourceLink",
+          "tagName": "link"
+        },
+        {
+          "propertyName": "pubDate",
+          "tagName": "pubDate"
+        },
+        {
+          "propertyName": "guid",
+          "tagName": "guid"
+        },
+        {
+          "propertyName": "imgUrl",
+          "tagName": "enclosure#url"
+        },
+        {
+          "propertyName": "creator",
+          "tagName": "dc:creator"
+        },
+        {
+          "propertyName": "img",
+          "tagName": "media:content"
+        }
+      ]
+    }
+  ]
+}
