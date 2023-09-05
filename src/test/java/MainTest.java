@@ -21,17 +21,15 @@ class MainTest {
         String path = "https://vnexpress.net/rss/tin-moi-nhat.rss";
         NodeList list = BingNewsService.getItemsFromRssUrl(path);
         assertNotNull(list);
-        for (int i = 0; i <= list.getLength(); i++) {
-            System.out.println(list.item(i).getTextContent());
-        }
-    }
+        assertTrue(list.getLength() > 0);
 
+    }
     @Test
     public void getAllArticles() throws Exception {
-        String bingNewsConfigPath = "src\\main\\resources\\BingNewsConfig.json";
-        var bingNewsConfig = BingNewsService.readConfig(bingNewsConfigPath, BingNewsConfig.class);
+        String bingNewsConfigPath = ".\\src\\main\\resources\\BingNewsConfig.json";
+        BingNewsConfig bingNewsConfig = BingNewsService.readConfig(bingNewsConfigPath, BingNewsConfig.class);
         String mappingConfigPath = ".\\src\\main\\resources\\MappingConfig.json";
-        var mappingConfig = BingNewsService.readConfig(mappingConfigPath, MappingConfig.class);
+        MappingConfig mappingConfig = BingNewsService.readConfig(mappingConfigPath, MappingConfig.class);
         List<Articles> listArticles = BingNewsService.getAllArticles(bingNewsConfig, mappingConfig);
 
         assertTrue(listArticles.size() > 0);

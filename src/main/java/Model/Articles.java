@@ -13,7 +13,28 @@ public class Articles {
     private String category;
     private String author;
 
+    public Articles(){
 
+    }
+
+    public Articles(String guid, String title, String description, String link, String pubDate, String category, String author) {
+        this.guid = guid;
+        this.title = title;
+        this.description = description;
+        this.link = link;
+        this.pubDate = pubDate;
+        this.category = category;
+        this.author=author;
+    }
+    public void printOutInfo() {
+        System.out.println();
+        System.out.println("Guid: " + this.guid);
+        System.out.println("Title: " + this.title);
+        System.out.println("Description: " + this.description);
+        System.out.println("PubDate: " + this.pubDate);
+        System.out.println("Link: " + this.link);
+        System.out.println("Category" + this.category);
+    }
     @JsonProperty("title")
     public String getTitle() {
         return title;
@@ -34,12 +55,12 @@ public class Articles {
         this.description = value;
     }
 
-    @JsonProperty("url")
+    @JsonProperty("link")
     public String getURL() {
         return link;
     }
 
-    @JsonProperty("url")
+    @JsonProperty("link")
     public void setURL(String value) {
         this.link = value;
     }
@@ -84,14 +105,15 @@ public class Articles {
         this.author = value;
     }
 
-    private List<Articles> articleList;
-
-    public List<Articles> getArticleList() {
-        return articleList;
-    }
-
-    public void setArticleList(List<Articles> articleList) {
-        this.articleList = articleList;
-    }
+//    private List<Articles> articleList;
+//    @JsonProperty("articleList")
+//    public List<Articles> getArticleList() {
+//        return articleList;
+//    }
+//
+//    @JsonProperty("articleList")
+//    public void setArticleList(List<Articles> articleList) {
+//        this.articleList = articleList;
+//    }
 
 }

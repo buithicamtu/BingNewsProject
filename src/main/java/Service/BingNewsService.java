@@ -3,6 +3,7 @@ package Service;
 import Configuration.BingNewsConfig;
 import Configuration.Channel;
 import Configuration.MappingConfig;
+import Configuration.PropertyMapping;
 import Model.Articles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
@@ -17,12 +18,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BingNewsService {
 
@@ -43,30 +42,35 @@ public class BingNewsService {
         return listChannels;
     }
 
-    public static NodeList getItemsFromRssUrl(String url) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = (Document) db.parse(new URL(url).openStream());
-        NodeList listItems = doc.getElementsByTagName("item");
+    public static NodeList getItemsFromRssUrl(String rssUrl) throws ParserConfigurationException, IOException, SAXException {
+        URL url = new URL(rssUrl);
+        try (InputStream inputStream = url.openStream()) {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
 
-        return listItems;
-
+            Document doc = db.parse(inputStream);
+            doc.getDocumentElement().normalize();
+            return doc.getElementsByTagName("item");
+        }
     }
 
     public static List<Articles> getAllArticles(BingNewsConfig bingNewsConfig, MappingConfig propertyMapConfig) throws Exception {
-
         List<Channel> listChannel = getListChannel(bingNewsConfig);
         List<Articles> listArticle = new ArrayList<>();
+
         for (var channel : listChannel) {
             NodeList nodeList = getItemsFromRssUrl(channel.getRSSURL());
-            for (int i = 0; i <= nodeList.getLength(); i++) {
-                channel.setPropertyMappings(propertyMapConfig.getChannels()
-                        .stream()
-                        .filter(x -> x.getChannelName().equals(channel.getChannelName()))
-                        .findFirst()
-                        .orElse(null)
-                        .getPropertyMappings());
-                Articles atc = parseNodeItem(nodeList.item(i), channel, Articles.class);
+
+            List<PropertyMapping> propertyMappings = propertyMapConfig.getChannels()
+                    .stream()
+                    .filter(x -> x.getChannelName().equals(channel.getChannelName()))
+                    .findFirst()
+                    .map(Channel::getPropertyMappings)
+                    .orElse(Collections.emptyList());
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                channel.setPropertyMappings(propertyMappings);
+                Articles atc = mapNodeItem(nodeList.item(i), channel, Articles.class);
                 listArticle.add(atc);
             }
 
@@ -74,21 +78,40 @@ public class BingNewsService {
         return listArticle;
     }
 
-    public static <T> T parseNodeItem(Node node, Channel channel, Class<T> classTarget) throws Exception {
+//    public static <T> T mapNodeItem(Node node, Channel channel, Class<T> classTarget) throws Exception {
+//        T instance = classTarget.newInstance();
+//        if (node.getNodeType() == Node.ELEMENT_NODE) {
+//            Element itemElement = (Element) node;
+//            for (var propertyMap : channel.getPropertyMappings()) {
+//                String propertyName = propertyMap.getPropertyName();
+//                String value = itemElement.getElementsByTagName(propertyMap.getTagName()).item(0).getTextContent();
+//                setPropertyValue(instance, propertyName, value);
+//            }
+//        }
+//        return instance;
+//    }
+
+    public static <T> T mapNodeItem(Node item, Channel channel, Class<T> classTarget) throws Exception {
         T instance = classTarget.newInstance();
 
-        if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Element itemElement = (Element) node;
+        if (item.getNodeType() == Node.ELEMENT_NODE) {
+            Element itemElement = (Element) item;
             for (var propertyMap : channel.getPropertyMappings()) {
                 String propertyName = propertyMap.getPropertyName();
-                String value = itemElement.getElementsByTagName(propertyMap.getTagName()).item(0).getTextContent();
-                setPropertyValue(instance, propertyName, value);
+                String tagName = propertyMap.getTagName();
+                NodeList nodeList = itemElement.getElementsByTagName(tagName);
+
+                // Check if the nodeList is empty or the item is null
+                if (nodeList.getLength() > 0 && nodeList.item(0) != null) {
+                    String value = nodeList.item(0).getTextContent();
+                    setPropertyValue(instance, propertyName, value);
+                }
             }
         }
         return instance;
     }
 
-    public static void setPropertyValue(Object obj, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+    public static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
         Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(obj, value);
