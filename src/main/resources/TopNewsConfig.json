@@ -1,0 +1,72 @@
+{
+  "TopNewsAPI": [
+    {
+      "name": "NewsData API",
+      "uri": "https://newsdata.io/api/1/news?country=vi&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636",
+      "mapping": [
+        {
+          "propertyName": "title",
+          "tagName": "title"
+        },
+        {
+          "propertyName": "description",
+          "tagName": "description"
+        },
+        {
+          "propertyName": "link",
+          "tagName": "link"
+        },
+        {
+          "propertyName": "pubDate",
+          "tagName": "pubDate"
+        },
+        {
+          "propertyName": "article_id",
+          "tagName": "article_id"
+        },
+        {
+          "propertyName": "video_url",
+          "tagName": "videoURL"
+        },
+        {
+          "propertyName": "creator",
+          "tagName": "creator"
+        }
+      ]
+    },
+    {
+      "name": "NewsData API",
+      "uri": "https://newsdata.io/api/1/news?country=jp&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636",
+      "mapping": [
+        {
+          "propertyName": "title",
+          "tagName": "title"
+        },
+        {
+          "propertyName": "description",
+          "tagName": "description"
+        },
+        {
+          "propertyName": "link",
+          "tagName": "link"
+        },
+        {
+          "propertyName": "pubDate",
+          "tagName": "pubDate"
+        },
+        {
+          "propertyName": "article_id",
+          "tagName": "article_id"
+        },
+        {
+          "propertyName": "video_url",
+          "tagName": "videoURL"
+        },
+        {
+          "propertyName": "creator",
+          "tagName": "creator"
+        }
+      ]
+    }
+  ]
+}

@@ -16,11 +16,14 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
 
 public class BingNewsService {
@@ -73,23 +76,9 @@ public class BingNewsService {
                 Articles atc = mapNodeItem(nodeList.item(i), channel, Articles.class);
                 listArticle.add(atc);
             }
-
         }
         return listArticle;
     }
-
-//    public static <T> T mapNodeItem(Node node, Channel channel, Class<T> classTarget) throws Exception {
-//        T instance = classTarget.newInstance();
-//        if (node.getNodeType() == Node.ELEMENT_NODE) {
-//            Element itemElement = (Element) node;
-//            for (var propertyMap : channel.getPropertyMappings()) {
-//                String propertyName = propertyMap.getPropertyName();
-//                String value = itemElement.getElementsByTagName(propertyMap.getTagName()).item(0).getTextContent();
-//                setPropertyValue(instance, propertyName, value);
-//            }
-//        }
-//        return instance;
-//    }
 
     public static <T> T mapNodeItem(Node item, Channel channel, Class<T> classTarget) throws Exception {
         T instance = classTarget.newInstance();
@@ -111,10 +100,17 @@ public class BingNewsService {
         return instance;
     }
 
-    public static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
+    private static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
         Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(obj, value);
+    }
+
+    public static Object getTopNews(BingNewsConfig confg) {
+        //Json format for API --> done
+        // API Request --> ouput: JSON
+        // parse data from JSON
+        return null;
     }
 
 }
