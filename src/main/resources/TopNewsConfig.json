@@ -1,8 +1,9 @@
 {
-  "TopNewsAPI": [
+  "TopNewsConfig": [
     {
       "name": "NewsData API",
       "uri": "https://newsdata.io/api/1/news?country=vi&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636",
+      "result": "results",
       "mapping": [
         {
           "propertyName": "title",
@@ -37,6 +38,7 @@
     {
       "name": "NewsData API",
       "uri": "https://newsdata.io/api/1/news?country=jp&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636",
+      "result": "results",
       "mapping": [
         {
           "propertyName": "title",

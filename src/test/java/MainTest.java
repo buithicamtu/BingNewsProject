@@ -1,11 +1,13 @@
 
 import Configuration.BingNewsConfig;
 import Configuration.MappingConfig;
+import Configuration.MapTopNews;
+import Configuration.TopNewsConfig;
 import Model.Articles;
+import Model.TopNews;
 import Service.BingNewsService;
 import Service.NewsApiReader;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -13,11 +15,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 
+import static Service.BingNewsService.getTopNews;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
@@ -30,6 +30,7 @@ class MainTest {
         assertTrue(list.getLength() > 0);
 
     }
+
     @Test
     public void getAllArticles() throws Exception {
         String bingNewsConfigPath = ".\\src\\main\\resources\\BingNewsConfig.json";
@@ -49,18 +50,19 @@ class MainTest {
     }
 
     @org.junit.jupiter.api.Test
-    void getTopNews() throws Exception {
-        String topNewsConfgPath = "";
-        BingNewsConfig Confg = BingNewsService.readConfig(topNewsConfgPath, BingNewsConfig.class);
-        var topNews = BingNewsService.getTopNews(Confg);
-        assertNotNull(topNews);
+    public void getAllTopNews() throws Exception {
+        String topNewsConfgPath = "src\\main\\resources\\TopNewsConfig.json";
+        var Confg = BingNewsService.readConfig(topNewsConfgPath, TopNewsConfig.class);
+        List<TopNews> listTN = getTopNews(Confg);
+        assertNotNull(listTN);
     }
 
     @org.junit.jupiter.api.Test
     public void fetchJsonFromUrl() throws IOException, InterruptedException, URISyntaxException {
-         String path = "https://newsdata.io/api/1/news?country=vi&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636";
-         URI uri = new URI(path);
+        String path = "https://newsdata.io/api/1/news?country=jp&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636";
+        URI uri = new URI(path);
         var item = NewsApiReader.getResponse(uri);
+        //var listATC = NewsApiReader.parseJson(item.body());
         assertNotNull(item);
         System.out.println(item.body());
     }

@@ -1,12 +1,10 @@
 package Service;
 
-import Configuration.BingNewsConfig;
-import Configuration.Channel;
-import Configuration.MappingConfig;
-import Configuration.PropertyMapping;
+import Configuration.*;
 import Model.Articles;
+import Model.TopNews;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,13 +16,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.*;
+
+import static Service.NewsApiReader.getResponse;
 
 public class BingNewsService {
 
@@ -73,14 +69,14 @@ public class BingNewsService {
 
             for (int i = 0; i < nodeList.getLength(); i++) {
                 channel.setPropertyMappings(propertyMappings);
-                Articles atc = mapNodeItem(nodeList.item(i), channel, Articles.class);
+                Articles atc = mapArticles(nodeList.item(i), channel, Articles.class);
                 listArticle.add(atc);
             }
         }
         return listArticle;
     }
 
-    public static <T> T mapNodeItem(Node item, Channel channel, Class<T> classTarget) throws Exception {
+    public static <T> T mapArticles(Node item, Channel channel, Class<T> classTarget) throws Exception {
         T instance = classTarget.newInstance();
 
         if (item.getNodeType() == Node.ELEMENT_NODE) {
@@ -100,17 +96,39 @@ public class BingNewsService {
         return instance;
     }
 
-    private static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
+    public static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
         Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(obj, value);
     }
 
-    public static Object getTopNews(BingNewsConfig confg) {
-        //Json format for API --> done
-        // API Request --> ouput: JSON
-        // parse data from JSON
-        return null;
+    public static List<TopNews> mapTopNews(String response, MapTopNews topNewsConfg) throws Exception {
+        List<TopNews> listAtc = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response);
+        rootNode = rootNode.get(topNewsConfg.getResult());
+
+        for (var articleNode : rootNode) {
+            TopNews topNews = new TopNews();
+            for (var item : topNewsConfg.getMapping()) {
+                String value = articleNode.findPath(item.getTagName()).asText();
+                setPropertyValue(topNews, item.getPropertyName(), value);
+            }
+            listAtc.add(topNews);
+        }
+        return listAtc;
+    }
+
+    public static List<TopNews> getTopNews(TopNewsConfig confg) throws Exception {
+        var listAPI = confg.getTopNewsConfig();
+        var listNews = new ArrayList<TopNews>();
+        for (var api : listAPI) {
+            var uri = api.getURI();
+            var items = getResponse(URI.create(uri));
+            var list = mapTopNews(items.body(), api);
+            listNews.addAll(list);
+        }
+        return listNews;
     }
 
 }

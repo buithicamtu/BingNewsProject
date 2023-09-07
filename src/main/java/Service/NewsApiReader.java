@@ -10,13 +10,13 @@ public class NewsApiReader {
     private static HttpResponse<String> response;
     private URI uri;
 
-    public static HttpRequest getRequest(URI newUri) {
+    private static HttpRequest getRequest(URI newUri) {
         return HttpRequest.newBuilder()
                 .uri(newUri)
                 .build();
     }
 
-    public static HttpClient getClient() {
+    private static HttpClient getClient() {
         return HttpClient.newBuilder().build();
     }
 
@@ -30,5 +30,6 @@ public class NewsApiReader {
         }
         return response;
     }
+
 
 }
