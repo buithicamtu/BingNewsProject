@@ -1,10 +1,15 @@
 package Service;
 
 import Configuration.*;
+import Configuration.Weather.DefaultParameters;
 import Model.Articles;
 import Model.TopNews;
+import Model.WeatherData;
+import Model.TimeZone;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +24,8 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import static Service.NewsApiReader.getResponse;
 
@@ -96,7 +103,7 @@ public class BingNewsService {
         return instance;
     }
 
-    public static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception, IllegalAccessException {
+    public static void setPropertyValue(Object obj, String fieldName, Object value) throws Exception {
         Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(obj, value);
@@ -119,8 +126,8 @@ public class BingNewsService {
         return listAtc;
     }
 
-    public static List<TopNews> getTopNews(TopNewsConfig confg) throws Exception {
-        var listAPI = confg.getTopNewsConfig();
+    public static List<TopNews> getTopNews(TopNewsConfig config) throws Exception {
+        var listAPI = config.getTopNewsConfig();
         var listNews = new ArrayList<TopNews>();
         for (var api : listAPI) {
             var uri = api.getURI();
@@ -131,5 +138,40 @@ public class BingNewsService {
         return listNews;
     }
 
+    public static String changeLocation(Float latitude, Float longitude, DefaultParameters defaultParam) throws Exception {
+        String API_URL = "https://api.open-meteo.com/v1/forecast";
+        String apiUrl = String.format("%s?latitude=%.6f&longitude=%.6f&hourly=%s&past_days=%s&forecast_days=%s", API_URL,
+                latitude, longitude, defaultParam.getHourly(), defaultParam.getPastDays(), defaultParam.getForecastDays());
+        return apiUrl;
+    }
+
+    public static List<WeatherData> getWeatherInfo(String apiUrl) {
+        //send API request
+        //get current weather
+        //get forecast weather
+        String apiResponse = String.valueOf(getResponse(URI.create(apiUrl)));
+       var location = new TimeZone();
+        var listForecast = new WeatherData();
+
+        return null;
+    }
+
+//    public static TimeZone getLocationInfo(String apiResponse) throws IOException {
+//        String timezone = apiResponse.get("timezone").toString();
+//        String timezoneAbbreviation = apiResponse.get("timezone_abbreviation").toString();
+//
+//        return new TimeZone(timezone, timezoneAbbreviation);
+//    }
+    public static TimeZone getLocationInfo(String apiResponse) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(apiResponse).getAsJsonObject();
+
+        String timezone = jsonObject.get("timezone").getAsString();
+        String timezoneAbbreviation = jsonObject.get("timezone_abbreviation").getAsString();
+
+        return new TimeZone(timezone, timezoneAbbreviation);
+    }
 }
+
+
 

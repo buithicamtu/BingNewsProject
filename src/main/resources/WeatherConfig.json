@@ -1,0 +1,24 @@
+{
+  "api_endpoint": "https://api.open-meteo.com/v1/forecast",
+  "default_parameters": {
+    "hourly": "temperature_2m,precipitation_probability,precipitation,rain&current_weather=true&timezone=auto",
+    "past_days": "7",
+    "forecast_days": "16"
+  },
+  "timezone": "",
+  "timezone_abbreviation": "",
+  "mapping": [
+    {
+      "propertyName": "time",
+      "tagName": "time"
+    },
+    {
+      "propertyName": "temperature_2m",
+      "tagName": "temp"
+    },
+    {
+      "propertyName": "precipitation_probability",
+      "tagName": "precipitation"
+    }
+  ]
+}

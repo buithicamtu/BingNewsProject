@@ -1,8 +1,6 @@
 
-import Configuration.BingNewsConfig;
-import Configuration.MappingConfig;
-import Configuration.MapTopNews;
-import Configuration.TopNewsConfig;
+import Configuration.*;
+import Configuration.Weather.WeatherConfig;
 import Model.Articles;
 import Model.TopNews;
 import Service.BingNewsService;
@@ -23,42 +21,37 @@ import static org.junit.jupiter.api.Assertions.*;
 class MainTest {
 
     @org.junit.jupiter.api.Test
-    public void getItemsFromRssUrl() throws ParserConfigurationException, IOException, SAXException {
+    public void testGetItemsFromRssUrl() throws ParserConfigurationException, IOException, SAXException {
         String path = "https://vnexpress.net/rss/tin-moi-nhat.rss";
         NodeList list = BingNewsService.getItemsFromRssUrl(path);
         assertNotNull(list);
         assertTrue(list.getLength() > 0);
-
     }
 
     @Test
-    public void getAllArticles() throws Exception {
-        String bingNewsConfigPath = ".\\src\\main\\resources\\BingNewsConfig.json";
-        BingNewsConfig bingNewsConfig = BingNewsService.readConfig(bingNewsConfigPath, BingNewsConfig.class);
-        String mappingConfigPath = ".\\src\\main\\resources\\MappingConfig.json";
-        MappingConfig mappingConfig = BingNewsService.readConfig(mappingConfigPath, MappingConfig.class);
+    public void testGetAllArticles() throws Exception {
+        String file = ".\\src\\main\\resources\\BingNewsConfig.json";
+        var config = BingNewsService.readConfig(file, BingNewsConfig.class);
+        String mappingFile = ".\\src\\main\\resources\\MappingConfig.json";
+        var mappingConfig = BingNewsService.readConfig(mappingFile, MappingConfig.class);
 
-        List<Articles> listArticles = BingNewsService.getAllArticles(bingNewsConfig, mappingConfig);
+        List<Articles> listArticles = BingNewsService.getAllArticles(config, mappingConfig);
 
         assertFalse(listArticles.isEmpty());
         assertNotNull(listArticles);
-    }
 
-
-    @org.junit.jupiter.api.Test
-    void getAllAdTopic() {
     }
 
     @org.junit.jupiter.api.Test
-    public void getAllTopNews() throws Exception {
-        String topNewsConfgPath = "src\\main\\resources\\TopNewsConfig.json";
-        var Confg = BingNewsService.readConfig(topNewsConfgPath, TopNewsConfig.class);
-        List<TopNews> listTN = getTopNews(Confg);
-        assertNotNull(listTN);
+    public void testGetAllTopNews() throws Exception {
+        String topNewsFile = "src\\main\\resources\\TopNewsConfig.json";
+        var config = BingNewsService.readConfig(topNewsFile, TopNewsConfig.class);
+        List<TopNews> newsSet = getTopNews(config);
+        assertNotNull(newsSet);
     }
 
     @org.junit.jupiter.api.Test
-    public void fetchJsonFromUrl() throws IOException, InterruptedException, URISyntaxException {
+    public void testFetchJsonFromUrl() throws IOException, InterruptedException, URISyntaxException {
         String path = "https://newsdata.io/api/1/news?country=jp&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636";
         URI uri = new URI(path);
         var item = NewsApiReader.getResponse(uri);
@@ -66,4 +59,23 @@ class MainTest {
         assertNotNull(item);
         System.out.println(item.body());
     }
+
+    @org.junit.jupiter.api.Test
+    void getAllAdTopic() {
+    }
+
+    @Test
+    public void testGetLocationInfo() throws Exception {
+        //read weather config
+        String weatherFile = "src\\main\\resources\\WeatherConfig.json";
+        var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
+        var defautCfg = weatherConfig.getDefaultParameters();
+        // latitude + longitude --> change
+        var apiURL = BingNewsService.changeLocation(10.762622F, 106.660172F, defautCfg);
+        var weatherAPI = NewsApiReader.getResponse(URI.create(apiURL));
+        var locationInfo = BingNewsService.getLocationInfo(weatherAPI.body());
+        assertEquals("Asia/Ho_Chi_Minh", locationInfo.getTimezone());
+    }
+
+
 }
