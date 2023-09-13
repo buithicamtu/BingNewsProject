@@ -182,6 +182,40 @@ public class BingNewsService {
         return new TimeZone(timezone, timezoneAbbreviation);
     }
 
+    public static void compareCurrentWeatherToHourly(String url, WeatherData data, WeatherConfig config) throws Exception {
+        HttpResponse<String> apiUrl = NewsApiReader.getResponse(URI.create(url));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(apiUrl.body());
+        JsonNode hourlyNode = rootNode.path("hourly");
+
+        // Extract hourly data as arrays
+        JsonNode timeNode = hourlyNode.path("time");
+        JsonNode temperatureNode = hourlyNode.path("temperature_2m");
+
+        String[] hourlyTimes = objectMapper.treeToValue(timeNode, String[].class);
+        String[] hourlyTemperatures = objectMapper.treeToValue(temperatureNode, String[].class);
+
+        // Compare current weather data with hourly data
+        String currentTime = data.getTime();
+        String currentTemperature = data.getTemperature();
+
+        for (int i = 0; i < hourlyTimes.length; i++) {
+            String hourlyTime = hourlyTimes[i];
+            String hourlyTemperature = hourlyTemperatures[i];
+
+            if (currentTime.equals(hourlyTime) && currentTemperature.equals(hourlyTemperature)) {
+                System.out.println("Current weather matches hourly data at index " + i);
+                return;
+            }
+        }
+    }
+
+
+
+    //TODO: Compare 2 strings "time (current)" + "time (hourly)" --> done
+    //TODO: forecast: Then add 4 next hours --> 1 set include 1 current hour + 4 next hours
+
 
 }
 

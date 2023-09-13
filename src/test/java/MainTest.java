@@ -72,19 +72,39 @@ class MainTest {
         String weatherFile = "src\\main\\resources\\WeatherConfig.json";
         var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
 
-         //latitude + longitude --> change
+        //latitude + longitude --> change
         var apiURL = BingNewsService.setLocation(10.762622F, 106.660172F, weatherConfig);
         var weatherAPI = getResponse(URI.create(apiURL));
         var locationInfo = BingNewsService.getLocationInfo(weatherAPI.body());
         assertEquals("Asia/Ho_Chi_Minh", locationInfo.getTimezone());
 
     }
+
     @Test
     public void testGetCurrentWeatherInfo() throws Exception {
         String weatherFile = "src\\main\\resources\\WeatherConfig.json";
         var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
         WeatherData weather = getWeatherInfo(10.762622F, 106.660172F, weatherConfig);
         assertNotNull(weather.getTime());
+    }
+    @Test
+    public void testForecastWeather() throws Exception {
+        //Read API
+        //get current weather
+        //compare current weather with List hourly
+        //then get 4 next hour
+        String weatherFile = "src\\main\\resources\\WeatherConfig.json";
+        var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
+
+        //latitude + longitude --> change
+        var apiURL = BingNewsService.setLocation(10.762622F, 106.660172F, weatherConfig);
+
+        WeatherData weather = getWeatherInfo(10.762622F, 106.660172F, weatherConfig);
+        assertNotNull(weather.getTime());
+        System.out.println(weather.getTime());
+
+        compareCurrentWeatherToHourly(apiURL, weather,weatherConfig);
+
 
     }
 }
