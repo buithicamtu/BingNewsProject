@@ -3,6 +3,7 @@ import Configuration.*;
 import Configuration.Weather.WeatherConfig;
 import Model.Articles;
 import Model.TopNews;
+import Model.WeatherData;
 import Service.BingNewsService;
 import Service.NewsApiReader;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static Service.BingNewsService.getTopNews;
+import static Service.BingNewsService.*;
+import static Service.NewsApiReader.getResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
@@ -54,7 +56,7 @@ class MainTest {
     public void testFetchJsonFromUrl() throws IOException, InterruptedException, URISyntaxException {
         String path = "https://newsdata.io/api/1/news?country=jp&apikey=pub_28863cb92c18d36e7fe58deaaa84e76250636";
         URI uri = new URI(path);
-        var item = NewsApiReader.getResponse(uri);
+        var item = getResponse(uri);
         //var listATC = NewsApiReader.parseJson(item.body());
         assertNotNull(item);
         System.out.println(item.body());
@@ -69,13 +71,20 @@ class MainTest {
         //read weather config
         String weatherFile = "src\\main\\resources\\WeatherConfig.json";
         var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
-        var defautCfg = weatherConfig.getDefaultParameters();
-        // latitude + longitude --> change
-        var apiURL = BingNewsService.changeLocation(10.762622F, 106.660172F, defautCfg);
-        var weatherAPI = NewsApiReader.getResponse(URI.create(apiURL));
+
+         //latitude + longitude --> change
+        var apiURL = BingNewsService.setLocation(10.762622F, 106.660172F, weatherConfig);
+        var weatherAPI = getResponse(URI.create(apiURL));
         var locationInfo = BingNewsService.getLocationInfo(weatherAPI.body());
         assertEquals("Asia/Ho_Chi_Minh", locationInfo.getTimezone());
+
     }
+    @Test
+    public void testGetCurrentWeatherInfo() throws Exception {
+        String weatherFile = "src\\main\\resources\\WeatherConfig.json";
+        var weatherConfig = BingNewsService.readConfig(weatherFile, WeatherConfig.class);
+        WeatherData weather = getWeatherInfo(10.762622F, 106.660172F, weatherConfig);
+        assertNotNull(weather.getTime());
 
-
+    }
 }

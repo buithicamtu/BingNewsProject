@@ -1,17 +1,15 @@
 package Configuration.Weather;
     // WeatherConfig.java
 
-import Configuration.PropertyMapping;
 import com.fasterxml.jackson.annotation.*;
-
-import java.util.List;
 
 public class WeatherConfig {
         private String apiEndpoint;
         private DefaultParameters defaultParameters;
         private String timezone;
         private String timezoneAbbreviation;
-        private List<PropertyMapping> mapping;
+        private MappingConfig currentWeatherMappingConfig;
+        private MappingConfig hourlyMappingConfig;
 
         @JsonProperty("api_endpoint")
         public String getAPIEndpoint() { return apiEndpoint; }
@@ -33,9 +31,14 @@ public class WeatherConfig {
         @JsonProperty("timezone_abbreviation")
         public void setTimezoneAbbreviation(String value) { this.timezoneAbbreviation = value; }
 
-        @JsonProperty("mapping")
-        public List<PropertyMapping> getMapping() { return mapping; }
-        @JsonProperty("mapping")
-        public void setMapping(List<PropertyMapping> value) { this.mapping = value; }
+        @JsonProperty("current_weather_config")
+        public MappingConfig getCurrentWeatherConfig() { return currentWeatherMappingConfig; }
+        @JsonProperty("current_weather_config")
+        public void setCurrentWeatherConfig(MappingConfig value) { this.currentWeatherMappingConfig = value; }
+
+        @JsonProperty("Hourly_Config")
+        public MappingConfig getHourlyConfig() { return hourlyMappingConfig; }
+        @JsonProperty("Hourly_Config")
+        public void setHourlyConfig(MappingConfig value) { this.hourlyMappingConfig = value; }
     }
 

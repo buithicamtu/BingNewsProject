@@ -1,7 +1,8 @@
 package Service;
 
 import Configuration.*;
-import Configuration.Weather.DefaultParameters;
+import Configuration.Weather.MappingConfig;
+import Configuration.Weather.WeatherConfig;
 import Model.Articles;
 import Model.TopNews;
 import Model.WeatherData;
@@ -9,7 +10,6 @@ import Model.TimeZone;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,7 +23,9 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpResponse;
 import java.util.*;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -60,7 +62,7 @@ public class BingNewsService {
         }
     }
 
-    public static List<Articles> getAllArticles(BingNewsConfig bingNewsConfig, MappingConfig propertyMapConfig) throws Exception {
+    public static List<Articles> getAllArticles(BingNewsConfig bingNewsConfig, Configuration.MappingConfig propertyMapConfig) throws Exception {
         List<Channel> listChannel = getListChannel(bingNewsConfig);
         List<Articles> listArticle = new ArrayList<>();
 
@@ -138,30 +140,38 @@ public class BingNewsService {
         return listNews;
     }
 
-    public static String changeLocation(Float latitude, Float longitude, DefaultParameters defaultParam) throws Exception {
+    public static String setLocation(Float latitude, Float longitude, WeatherConfig weatherConfig) throws Exception {
+        WeatherConfig config = readConfig("src/main/resources/WeatherConfig.json", WeatherConfig.class);
+
         String API_URL = "https://api.open-meteo.com/v1/forecast";
         String apiUrl = String.format("%s?latitude=%.6f&longitude=%.6f&hourly=%s&past_days=%s&forecast_days=%s", API_URL,
-                latitude, longitude, defaultParam.getHourly(), defaultParam.getPastDays(), defaultParam.getForecastDays());
+                latitude, longitude, config.getDefaultParameters().getHourly(), config.getDefaultParameters().getPastDays(), config.getDefaultParameters().getForecastDays());
         return apiUrl;
     }
 
-    public static List<WeatherData> getWeatherInfo(String apiUrl) {
-        //send API request
-        //get current weather
-        //get forecast weather
-        String apiResponse = String.valueOf(getResponse(URI.create(apiUrl)));
-       var location = new TimeZone();
-        var listForecast = new WeatherData();
+    public static WeatherData getWeatherInfo(Float latitude, Float longitude, WeatherConfig config) throws Exception {
+        String url = setLocation(latitude, longitude, config);
+        HttpResponse<String> apiUrl = NewsApiReader.getResponse(URI.create(url));
 
-        return null;
+        var currentWeather = new WeatherData();
+        currentWeather = mapWeatherData(apiUrl.body(), config.getCurrentWeatherConfig());
+        return currentWeather;
     }
 
-//    public static TimeZone getLocationInfo(String apiResponse) throws IOException {
-//        String timezone = apiResponse.get("timezone").toString();
-//        String timezoneAbbreviation = apiResponse.get("timezone_abbreviation").toString();
-//
-//        return new TimeZone(timezone, timezoneAbbreviation);
-//    }
+    public static WeatherData mapWeatherData(String apiResponse, MappingConfig mappingConfig) throws Exception {
+        //List<TopNews> listAtc = new ArrayList<>();
+        var weatherInfo = new WeatherData();
+        // var timeZoneInfo = new TimeZone();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(apiResponse);
+        rootNode = rootNode.get(mappingConfig.getTag());
+        for (var item : mappingConfig.getMapping()) {
+            String value = rootNode.findPath(item.getTagName()).asText();
+            setPropertyValue(weatherInfo, item.getPropertyName(), value);
+        }
+        return weatherInfo;
+    }
+
     public static TimeZone getLocationInfo(String apiResponse) {
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(apiResponse).getAsJsonObject();
@@ -171,7 +181,11 @@ public class BingNewsService {
 
         return new TimeZone(timezone, timezoneAbbreviation);
     }
+
+
 }
+
+
 
 
 

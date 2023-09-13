@@ -7,18 +7,34 @@
   },
   "timezone": "",
   "timezone_abbreviation": "",
-  "mapping": [
-    {
-      "propertyName": "time",
-      "tagName": "time"
-    },
-    {
-      "propertyName": "temperature_2m",
-      "tagName": "temp"
-    },
-    {
-      "propertyName": "precipitation_probability",
-      "tagName": "precipitation"
-    }
-  ]
+  "current_weather_config": {
+    "tag": "current_weather",
+    "mapping": [
+      {
+        "propertyName": "time",
+        "tagName": "time"
+      },
+      {
+        "propertyName": "temperature",
+        "tagName": "temperature"
+      }
+    ]
+  },
+  "Hourly_Config": {
+    "tag": "hourly",
+    "mapping": [
+      {
+        "propertyName": "time",
+        "tagName": "time"
+      },
+      {
+        "propertyName": "temperature_2m",
+        "tagName": "temperature_2m"
+      },
+      {
+        "propertyName": "precipitation_probability",
+        "tagName": "precipitation_probability"
+      }
+    ]
+  }
 }
